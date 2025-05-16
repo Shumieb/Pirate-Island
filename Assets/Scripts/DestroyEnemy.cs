@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class DestroyEnemy : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+    [SerializeField] GameObject rewardPrefab;
+
+
+    public void onDestroyEnemy()
     {
-        
+        //place Reward
+        Instantiate(rewardPrefab, transform.position, transform.rotation);
+
+        // destroy Enemy
+        Destroy(gameObject);
     }
 }

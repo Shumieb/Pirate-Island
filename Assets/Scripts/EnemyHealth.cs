@@ -13,14 +13,17 @@ public class EnemyHealth : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public void setHealth(float value)
+    private void Update()
     {
-        currentHealth += value;
-
         if (currentHealth <= 0)
         {
             // destroy Enemy
-            Debug.Log("Destroy Enemy");
+            gameObject.GetComponent<DestroyEnemy>().onDestroyEnemy();
         }
+    }
+
+    public void removeHealth(float value)
+    {
+        if (currentHealth > 0){ currentHealth -= value; }                
     }
 }

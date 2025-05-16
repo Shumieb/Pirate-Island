@@ -18,7 +18,7 @@ public class ColliderDetectPlayer : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.tag == "Player")
+        if(collision.gameObject.tag == "PlayerShip")
         {
             playerInZone = true;
             EnemyShootScript.SetPlayerInShotRange(playerInZone);
@@ -27,12 +27,11 @@ public class ColliderDetectPlayer : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.tag == "PlayerShip")
         {
             playerInZone = false;
             EnemyShootScript.SetPlayerInShotRange(playerInZone);
         }
     }
-
 
 }

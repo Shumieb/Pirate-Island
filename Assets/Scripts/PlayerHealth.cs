@@ -17,27 +17,46 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public int getCurrentLives() { return currentLives; }
+    private void Update()
+    {
+        if (currentHealth <= 0) 
+        { 
+            // remove health
+            removeLives(1);
 
-    public void setLives(int value){
-        currentLives += value;
-
-        if(currentLives <= 0)
+            // reset health
+            currentHealth = maxHealth;
+        }
+       
+        if (currentLives <= 0)
         {
             // destroy player
-            // game over
-            Debug.Log("Game Over");
+            gameObject.GetComponent<DestroyPlayer>().OnDestroyPlayer();
         }
     }
 
-    public float getHealth() { return currentHealth;}
+    public int getLives() { return currentLives; }
 
-    public void setHealth(float value) {  
-        currentHealth += value;
+    public void addLives(int value)
+    {
+        if(currentLives < maxLives) { currentLives -= value; }
+    }
 
-        if(currentHealth <= 0)
-        {
-            setLives(-1);
-        }
+    public void removeLives(int value)
+    {
+        if (currentLives > 0){ currentLives -= value; }        
+    }
+
+    public float getMaxHealth() { return maxHealth; }
+
+    public float getCurrentHealth() { return currentHealth;}
+
+    public void addHealth(float value)
+    {
+        if (currentHealth < maxHealth){ currentHealth += value;}
+    }
+
+    public void removeHealth(float value) {  
+        if(currentHealth > 0) { currentHealth -= value;}    
     }
 }
