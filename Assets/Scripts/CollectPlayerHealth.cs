@@ -14,7 +14,7 @@ public class CollectPlayerHealth : MonoBehaviour
             PlayerHealth playerHealthScript = collision.gameObject.GetComponentInParent<PlayerHealth>();
 
             // check health value
-            float playerMaxHealthValue = playerHealthScript.getCurrentHealth();
+            float playerMaxHealthValue = playerHealthScript.getMaxHealth();
             float playerCurrentHealthValue = playerHealthScript.getCurrentHealth();
            
             if(playerCurrentHealthValue < playerMaxHealthValue)

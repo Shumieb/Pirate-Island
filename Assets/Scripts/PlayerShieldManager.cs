@@ -1,16 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerShieldManager : MonoBehaviour
 {
 
     [SerializeField] bool shieldActive = false;
 
-    [SerializeField] float shieldMaxUpTime = 0.1f;
+    [SerializeField] int shieldCount = 0;
+
+    [SerializeField] float shieldMaxUpTime = 15.0f;
     [SerializeField] float shieldUpTime;
 
     [SerializeField] GameObject shield;
+
+    private float shieldActivated = 0f;
 
     private void Awake()
     {
@@ -19,6 +24,11 @@ public class PlayerShieldManager : MonoBehaviour
 
     void Update()
     {
+        if (shieldActivated >= 1 && !shieldActive)
+        {
+            activatePlayerShield();
+        }
+
         if (shieldActive && shieldUpTime < shieldMaxUpTime)
         {
             // activate shield
@@ -34,9 +44,27 @@ public class PlayerShieldManager : MonoBehaviour
         }
     }
 
-    public void activatePlayerShield(float maxUpTime)
+    private void activatePlayerShield()
     {
-        shieldMaxUpTime += maxUpTime;
-        shieldActive = true;
+        Debug.Log("activated");
+        if(shieldCount > 0)
+        {
+            shieldActive = true;
+        }
+        else
+        {
+            // display message to say no shields available
+            Debug.Log("no shield available");
+        }
+    }
+
+    public void addShield(int shieldNum)
+    {
+        shieldCount += shieldNum;
+    }
+
+    public void ActivateShield(InputAction.CallbackContext context)
+    {
+        shieldActivated = context.ReadValue<float>();
     }
 }

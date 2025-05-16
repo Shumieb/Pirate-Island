@@ -37,10 +37,7 @@ public class PlayerHealth : MonoBehaviour
 
     public int getLives() { return currentLives; }
 
-    public void addLives(int value)
-    {
-        if(currentLives < maxLives) { currentLives -= value; }
-    }
+    public void addLives(int value){currentLives += value; }
 
     public void removeLives(int value)
     {
@@ -53,7 +50,20 @@ public class PlayerHealth : MonoBehaviour
 
     public void addHealth(float value)
     {
-        if (currentHealth < maxHealth){ currentHealth += value;}
+        float totalHealth = currentHealth + value;
+
+        if (totalHealth > maxHealth)
+        {
+            int livesToAdd = (int)(totalHealth / maxHealth);
+            float healthToAdd = totalHealth % maxHealth;
+
+            currentHealth = healthToAdd;
+            addLives(livesToAdd);
+        }
+        else
+        {
+            currentHealth = totalHealth;
+        }
     }
 
     public void removeHealth(float value) {  

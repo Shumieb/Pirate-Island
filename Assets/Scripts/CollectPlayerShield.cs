@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class CollectPlayerShield : MonoBehaviour
 {
-    [SerializeField] float shieldUpTime = 15f;
+    [SerializeField] int shieldToAdd = 1;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "PlayerShip")
         {
             // activate player shield
-            collision.gameObject.GetComponentInParent<PlayerShieldManager>().activatePlayerShield(shieldUpTime);
+            collision.gameObject.GetComponentInParent<PlayerShieldManager>().addShield(shieldToAdd);
 
             // Destroy object
             Destroy(gameObject);
