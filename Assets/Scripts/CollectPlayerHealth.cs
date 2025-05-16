@@ -5,6 +5,8 @@ using UnityEngine;
 public class CollectPlayerHealth : MonoBehaviour
 {
 
+    [SerializeField] float healthToAdd = 10.0f;
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.tag == "PlayerShip")
@@ -18,7 +20,7 @@ public class CollectPlayerHealth : MonoBehaviour
             if(playerCurrentHealthValue < playerMaxHealthValue)
             {
                 // add player health
-                playerHealthScript.addHealth(2);
+                playerHealthScript.addHealth(healthToAdd);
                 // Destroy object
                 Destroy(gameObject);
             }
@@ -26,8 +28,7 @@ public class CollectPlayerHealth : MonoBehaviour
             {
                 // add message on the canvas
                 Debug.Log("Max Health reached");
-            }     
-           
+            }   
         }
     }
 }

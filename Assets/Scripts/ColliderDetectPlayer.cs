@@ -7,13 +7,11 @@ public class ColliderDetectPlayer : MonoBehaviour
 
     [SerializeField] bool playerInZone = false;
 
-    [SerializeField] GameObject currentEnemy;
-
-    [SerializeField] EnemyShoot EnemyShootScript;
+    private EnemyShoot EnemyShootScript;
 
     private void Awake()
     {
-        EnemyShootScript = currentEnemy.GetComponent<EnemyShoot>();
+        EnemyShootScript = gameObject.GetComponentInParent<EnemyShoot>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

@@ -9,6 +9,12 @@ public class DestroyEnemyBullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if(collision.gameObject.tag == "PlayerShield")
+        {
+            // Destroy the Bullet
+            Destroy(gameObject);
+        }
+
         if (collision.gameObject.tag == "PlayerShip")
         {
             // Deduct health from the player
@@ -16,8 +22,6 @@ public class DestroyEnemyBullet : MonoBehaviour
 
             // Destroy the Bullet
             Destroy(gameObject);
-        }
-        
+        }        
     }
-
 }

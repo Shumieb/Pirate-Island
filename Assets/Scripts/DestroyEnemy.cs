@@ -11,7 +11,7 @@ public class DestroyEnemy : MonoBehaviour
     public void onDestroyEnemy()
     {
         //place Reward
-        Instantiate(rewardPrefab, transform.position, transform.rotation);
+        Instantiate(rewardPrefab, transform.position, Quaternion.identity);
 
         // destroy Enemy
         Destroy(gameObject);
