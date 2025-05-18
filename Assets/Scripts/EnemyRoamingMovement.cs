@@ -6,101 +6,157 @@ public class EnemyRoamingMovement : MonoBehaviour
 {
 
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float speedModifier = 0.4f;
+
     [SerializeField] private float rotationSpeed = 50f;
+
     [SerializeField] private float minDistanceToPlayer;
+    [SerializeField] private float minDistanceToStartPoint;
 
     [SerializeField] float baseWaitTime = 5f;
     [SerializeField] bool startWaitTime = false;
 
-    [SerializeField] Transform startPoint;
-    [SerializeField] bool moveToStartPoint;
+    [SerializeField] bool followPlayer = false;
+    [SerializeField] bool moveToStartPoint = false;
+
+    [SerializeField] private float playerAwarenessDistance;
+
+    private Transform startPoint;
 
     private Vector2 playerDirection;
+    private Vector2 startPointDirection;
 
-    private float waitTime;
+    private float distanceFromPlayer;
+    private float distanceToStartPoint;
 
-    private PlayerAwarenessController playerAwarenessController;
+    [SerializeField] float waitTime = 5f;
 
     private Rigidbody2D rb;
+
+    private Transform player;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        playerAwarenessController = GetComponent<PlayerAwarenessController>();
+        player = FindObjectOfType<PlayerMovement>().transform;
+    }
+
+    private void Start()
+    {
+        startPoint = EnemyRoamingStartPointsManager.Instance.GetGreyShipStartPosition();
         waitTime = baseWaitTime;
     }
 
-    void FixedUpdate()
-    {       
-        //update Target distance
-        UpdatePlayerDirection();
-
-        // rotate towards player
-        RotateTowardsPlayer();
-
-        // move towards player
-        MoveTowardsPlayer();
-
-        if (startWaitTime && waitTime > 0)
-        {
-            waitTime -= Time.deltaTime;
-        }
-
-        if(waitTime <= 0)
-        {
-            startWaitTime = false;
-            moveToStartPoint = true;
-            waitTime = baseWaitTime;
-        }
-
-        if(moveToStartPoint)
-        {
-            transform.position = Vector2.MoveTowards(transform.position, startPoint.position, moveSpeed * Time.deltaTime);
-        }
+    void Update()
+    {
+        UpdatePlayerFollow();
     }
 
-    private void UpdatePlayerDirection()
+    void FixedUpdate()
     {
-        if (playerAwarenessController.AwareOfPlayer)
+        if (followPlayer)
         {
-            playerDirection = playerAwarenessController.DirectionToPlayer;
+            // rotate towards player
+            RotateTowardsPlayer();
+            // move towards player
+            MoveTowardsPlayer();
+        }
+        else {
 
-            // stop enemy moving towards start point
-            moveToStartPoint = false;
-            startWaitTime = false;
-            waitTime = baseWaitTime;
+            StopMovement();
+            StopRotation();
+
+            if (transform.position != startPoint.position)
+            {
+                // pause the enemy for a set time
+                moveToStartPoint = true;
+
+                RotateTowardStartPoint();
+                MoveTowardsStartPoint();
+            }
+          
+        }             
+    }
+
+    private void UpdatePlayerFollow()
+    {
+        // get player direction
+        Vector2 enemyToPlayerVector = player.position - transform.position;
+        playerDirection = enemyToPlayerVector.normalized;
+
+        // get player distance
+        distanceFromPlayer = enemyToPlayerVector.magnitude;
+
+        // update followPlayer variable
+        if (distanceFromPlayer < playerAwarenessDistance)
+        {
+            followPlayer = true;
         }
         else
         {
-            playerDirection = Vector2.zero;
+            followPlayer = false;
         }
     }
 
     private void RotateTowardsPlayer()
-    {
-        if (playerDirection == Vector2.zero)
-        {
-            return;
-        }
-
+    { 
         Quaternion targetRotation = Quaternion.LookRotation(transform.forward, playerDirection);
+        Quaternion rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        rb.SetRotation(rotation);
+    }
+
+    private void RotateTowardStartPoint()
+    {
+        // get player direction
+        Vector2 enemyToStartPointVector = startPoint.position - transform.position;
+        startPointDirection = enemyToStartPointVector.normalized;
+
+        // get player distance
+        distanceToStartPoint = enemyToStartPointVector.magnitude;
+
+        Quaternion targetRotation = Quaternion.LookRotation(transform.forward, startPointDirection);
         Quaternion rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         rb.SetRotation(rotation);
     }
 
     private void MoveTowardsPlayer()
     {
-        if (playerDirection == Vector2.zero || playerAwarenessController.DistanceFromPlayer < minDistanceToPlayer)
+        // check if the enemy is close to the player
+        if (distanceFromPlayer < minDistanceToPlayer)
         {
-            rb.velocity = Vector2.zero;
-
-            // get player to move towards start point
-            startWaitTime = true;
+            StopMovement();
         }
         else
         {
+            // move towards player
             rb.velocity = transform.up * moveSpeed * Time.deltaTime;
         }
     }
+
+    private void MoveTowardsStartPoint()
+    {
+        // check if the enemy is close to the start point
+        if (distanceToStartPoint < minDistanceToStartPoint)
+        {
+            StopMovement();
+            moveToStartPoint = false;
+        }
+        else
+        {
+            // move towards start point
+            rb.velocity = transform.up * (moveSpeed * speedModifier * Time.deltaTime);
+        }
+    }
+
+    private void StopMovement()
+    {
+        rb.velocity = Vector2.zero;
+    }
+
+    private void StopRotation()
+    {
+        playerDirection = Vector2.zero;
+    }
+
 
 }

@@ -12,12 +12,15 @@ public class PlayerAwarenessController : MonoBehaviour
     public float DistanceFromPlayer { get; private set; }
 
     [SerializeField] private float playerAwarenessDistance;
+
+    private EnemyRoamingMovement enemyRoamingMovementScript;
   
     private Transform player;
 
     void Awake()
     {
         player = FindObjectOfType<PlayerMovement>().transform;
+        enemyRoamingMovementScript = GetComponent<EnemyRoamingMovement>();  
     }
 
     void Update()
@@ -33,7 +36,7 @@ public class PlayerAwarenessController : MonoBehaviour
         }
         else
         {
-            AwareOfPlayer = false;
+           AwareOfPlayer= false;
         }
     }
 }
