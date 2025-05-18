@@ -13,13 +13,11 @@ public class EnemyRoamingMovement : MonoBehaviour
     [SerializeField] private float minDistanceToPlayer;
     [SerializeField] private float minDistanceToStartPoint;
 
-    [SerializeField] float baseWaitTime = 5f;
-    [SerializeField] bool startWaitTime = false;
-
     [SerializeField] bool followPlayer = false;
-    [SerializeField] bool moveToStartPoint = false;
 
     [SerializeField] private float playerAwarenessDistance;
+
+    [SerializeField] string shipColor;
 
     private Transform startPoint;
 
@@ -29,7 +27,7 @@ public class EnemyRoamingMovement : MonoBehaviour
     private float distanceFromPlayer;
     private float distanceToStartPoint;
 
-    [SerializeField] float waitTime = 5f;
+    //private float baseSpeedModifier = 1f;    
 
     private Rigidbody2D rb;
 
@@ -43,8 +41,7 @@ public class EnemyRoamingMovement : MonoBehaviour
 
     private void Start()
     {
-        startPoint = EnemyRoamingStartPointsManager.Instance.GetGreyShipStartPosition();
-        waitTime = baseWaitTime;
+        startPoint = EnemyRoamingStartPointsManager.Instance.GetStartPosition(shipColor);
     }
 
     void Update()
@@ -68,24 +65,21 @@ public class EnemyRoamingMovement : MonoBehaviour
 
             if (transform.position != startPoint.position)
             {
-                // pause the enemy for a set time
-                moveToStartPoint = true;
-
+                // rotate towards start point
                 RotateTowardStartPoint();
+                // move towards start point
                 MoveTowardsStartPoint();
             }
-          
         }             
     }
 
     private void UpdatePlayerFollow()
     {
         // get player direction
-        Vector2 enemyToPlayerVector = player.position - transform.position;
-        playerDirection = enemyToPlayerVector.normalized;
+        playerDirection = UpdateTargetVector(player.position).normalized;
 
         // get player distance
-        distanceFromPlayer = enemyToPlayerVector.magnitude;
+        distanceFromPlayer = UpdateTargetVector(player.position).magnitude;
 
         // update followPlayer variable
         if (distanceFromPlayer < playerAwarenessDistance)
@@ -99,24 +93,19 @@ public class EnemyRoamingMovement : MonoBehaviour
     }
 
     private void RotateTowardsPlayer()
-    { 
-        Quaternion targetRotation = Quaternion.LookRotation(transform.forward, playerDirection);
-        Quaternion rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        rb.SetRotation(rotation);
+    {
+        RotateEnemy(playerDirection);
     }
 
     private void RotateTowardStartPoint()
     {
-        // get player direction
-        Vector2 enemyToStartPointVector = startPoint.position - transform.position;
-        startPointDirection = enemyToStartPointVector.normalized;
+        // get start point direction
+        startPointDirection = UpdateTargetVector(startPoint.position).normalized;
 
-        // get player distance
-        distanceToStartPoint = enemyToStartPointVector.magnitude;
+        // get start point distance
+        distanceToStartPoint = UpdateTargetVector(startPoint.position).magnitude;
 
-        Quaternion targetRotation = Quaternion.LookRotation(transform.forward, startPointDirection);
-        Quaternion rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        rb.SetRotation(rotation);
+        RotateEnemy(startPointDirection);
     }
 
     private void MoveTowardsPlayer()
@@ -129,7 +118,7 @@ public class EnemyRoamingMovement : MonoBehaviour
         else
         {
             // move towards player
-            rb.velocity = transform.up * moveSpeed * Time.deltaTime;
+            MoveEnemy();
         }
     }
 
@@ -139,13 +128,30 @@ public class EnemyRoamingMovement : MonoBehaviour
         if (distanceToStartPoint < minDistanceToStartPoint)
         {
             StopMovement();
-            moveToStartPoint = false;
         }
         else
         {
             // move towards start point
-            rb.velocity = transform.up * (moveSpeed * speedModifier * Time.deltaTime);
+            MoveEnemy(speedModifier);
         }
+    }
+
+    private void RotateEnemy(Vector2 direction)
+    {
+        Quaternion targetRotation = Quaternion.LookRotation(transform.forward, direction);
+        Quaternion rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        rb.SetRotation(rotation);
+    }
+
+    private Vector2 UpdateTargetVector(Vector3 targetPosition)
+    {
+        Vector2 enemyToTargetVector = targetPosition - transform.position;
+        return enemyToTargetVector;
+    }
+
+    private void MoveEnemy( float modifier = 1f)
+    {
+        rb.velocity = transform.up * (moveSpeed * modifier * Time.deltaTime);
     }
 
     private void StopMovement()
@@ -157,6 +163,5 @@ public class EnemyRoamingMovement : MonoBehaviour
     {
         playerDirection = Vector2.zero;
     }
-
 
 }

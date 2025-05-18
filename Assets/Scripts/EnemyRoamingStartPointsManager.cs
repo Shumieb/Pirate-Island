@@ -24,7 +24,13 @@ public class EnemyRoamingStartPointsManager : MonoBehaviour
         }
     }
 
-    public Transform GetGreyShipStartPosition() { return greyShipStartPosition;}
-
-    public Transform GetYellowShipStartPosition() { return yellowShipStartPosition;}
+    public Transform GetStartPosition(string ship) {
+        return ship switch
+        {
+            "greyShip" => greyShipStartPosition,
+            "yellowShip" => yellowShipStartPosition,
+            _ => null,
+        };
+    }
+    
 }
