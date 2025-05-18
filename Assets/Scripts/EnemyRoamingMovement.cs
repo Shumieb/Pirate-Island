@@ -5,89 +5,102 @@ using UnityEngine;
 public class EnemyRoamingMovement : MonoBehaviour
 {
 
-    [SerializeField] bool playerInRange = false;
-    [SerializeField] bool playerFound=false;
-
-    [SerializeField] bool canFollowplayer = false;
-
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotationSpeed = 50f;
     [SerializeField] private float minDistanceToPlayer;
 
-    private Vector2 directionToPlayer;
-    private float distanceToPlayer;
-    private Transform player;
+    [SerializeField] float baseWaitTime = 5f;
+    [SerializeField] bool startWaitTime = false;
+
+    [SerializeField] Transform startPoint;
+    [SerializeField] bool moveToStartPoint;
+
+    private Vector2 playerDirection;
+
+    private float waitTime;
+
+    private PlayerAwarenessController playerAwarenessController;
 
     private Rigidbody2D rb;
 
     void Awake()
     {
-      rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
+        playerAwarenessController = GetComponent<PlayerAwarenessController>();
+        waitTime = baseWaitTime;
     }
 
-    void Update()
-    {
-        // get a reference to the player when the player is in range
-        if(playerInRange && !playerFound)
+    void FixedUpdate()
+    {       
+        //update Target distance
+        UpdatePlayerDirection();
+
+        // rotate towards player
+        RotateTowardsPlayer();
+
+        // move towards player
+        MoveTowardsPlayer();
+
+        if (startWaitTime && waitTime > 0)
         {
-            // find the reference to the player
-            player = FindObjectOfType<PlayerMovement>().transform;
-            
-            if(player != null)
-            {
-                // set the player found to false
-                playerFound = true;
-            }
+            waitTime -= Time.deltaTime;
         }
 
-        if(playerInRange && playerFound)
+        if(waitTime <= 0)
         {
-           // get player direction and distance
-            Vector2 enemyToPlayerVector = player.position - transform.position;
-            directionToPlayer = enemyToPlayerVector.normalized;
-            distanceToPlayer = enemyToPlayerVector.magnitude;
-
-            // rotate towards player
-            RotateTowardsTarget();
-
-            // move towards player
-            MoveTowardsPlayer();
+            startWaitTime = false;
+            moveToStartPoint = true;
+            waitTime = baseWaitTime;
         }
 
-        if(!playerInRange && playerFound)
+        if(moveToStartPoint)
         {
-            playerFound= false;
-            player = null;
+            transform.position = Vector2.MoveTowards(transform.position, startPoint.position, moveSpeed * Time.deltaTime);
         }
     }
 
-    private void RotateTowardsTarget()
+    private void UpdatePlayerDirection()
     {
-        if (directionToPlayer == Vector2.zero)
+        if (playerAwarenessController.AwareOfPlayer)
+        {
+            playerDirection = playerAwarenessController.DirectionToPlayer;
+
+            // stop enemy moving towards start point
+            moveToStartPoint = false;
+            startWaitTime = false;
+            waitTime = baseWaitTime;
+        }
+        else
+        {
+            playerDirection = Vector2.zero;
+        }
+    }
+
+    private void RotateTowardsPlayer()
+    {
+        if (playerDirection == Vector2.zero)
         {
             return;
         }
 
-        Quaternion targetRotation = Quaternion.LookRotation(transform.forward, directionToPlayer);
+        Quaternion targetRotation = Quaternion.LookRotation(transform.forward, playerDirection);
         Quaternion rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         rb.SetRotation(rotation);
     }
 
     private void MoveTowardsPlayer()
     {
-        if (directionToPlayer == Vector2.zero || distanceToPlayer <= minDistanceToPlayer)
+        if (playerDirection == Vector2.zero || playerAwarenessController.DistanceFromPlayer < minDistanceToPlayer)
         {
             rb.velocity = Vector2.zero;
+
+            // get player to move towards start point
+            startWaitTime = true;
         }
         else
         {
             rb.velocity = transform.up * moveSpeed * Time.deltaTime;
         }
-    }
-
-    public void SetPlayerInRange(bool value)
-    {
-        playerInRange = value;
     }
 
 }

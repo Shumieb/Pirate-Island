@@ -6,6 +6,7 @@ public class ColliderDetectPlayer : MonoBehaviour
 {
 
     [SerializeField] bool playerInZone = false;
+    [SerializeField] float damageAmount = 2f;
 
     private EnemyShoot EnemyShootScript;
 
@@ -20,6 +21,9 @@ public class ColliderDetectPlayer : MonoBehaviour
         {
             playerInZone = true;
             EnemyShootScript.SetPlayerInShotRange(playerInZone);
+
+            // update damage amount
+            EnemyDamageAmountManager.Instance.SetDamageAmount(damageAmount);
         }
     }
 

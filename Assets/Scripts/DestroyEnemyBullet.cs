@@ -7,6 +7,11 @@ public class DestroyEnemyBullet : MonoBehaviour
 
     [SerializeField] float damageAmount = 2.0f;
 
+    private void Awake()
+    {
+        damageAmount = EnemyDamageAmountManager.Instance.GetDamageAmount();
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.tag == "PlayerShield")
