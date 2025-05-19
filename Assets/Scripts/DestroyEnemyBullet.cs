@@ -7,10 +7,7 @@ public class DestroyEnemyBullet : MonoBehaviour
 
     [SerializeField] float damageAmount = 2.0f;
 
-    private void Awake()
-    {
-        damageAmount = EnemyDamageAmountManager.Instance.GetDamageAmount();
-    }
+    [SerializeField] GameObject impactPrefab;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -22,6 +19,12 @@ public class DestroyEnemyBullet : MonoBehaviour
 
         if (collision.gameObject.tag == "PlayerShip")
         {
+            // instatiate impact
+            Instantiate(impactPrefab, transform.position, transform.rotation);
+
+            // update damage amount
+            damageAmount = EnemyDamageAmountManager.Instance.GetDamageAmount();
+
             // Deduct health from the player
             collision.gameObject.GetComponentInParent<PlayerHealth>().removeHealth(damageAmount);
 

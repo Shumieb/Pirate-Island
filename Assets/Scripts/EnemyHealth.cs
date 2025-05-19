@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
@@ -13,6 +14,10 @@ public class EnemyHealth : MonoBehaviour
 
     [SerializeField] Image slider;
 
+    [SerializeField] GameObject damagedShip;
+
+    [SerializeField] GameObject[] damageEffects;
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -21,6 +26,7 @@ public class EnemyHealth : MonoBehaviour
 
     private void Update()
     {
+
         if (currentHealth <= 0)
         {
             // destroy Enemy
@@ -28,10 +34,11 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    public void removeHealth(float value)
+    public void removeHealth(int value)
     {
         if (currentHealth > 0){ currentHealth -= value; }
         UpdateHealthBar();
+        addDamageEffects();
     }
 
     private void UpdateHealthBar()
@@ -39,4 +46,27 @@ public class EnemyHealth : MonoBehaviour
         slider.fillAmount = currentHealth / maxHealth;
     }
 
+    private void addDamageEffects()
+    {
+        float damageValue = (currentHealth / maxHealth);
+
+        // set damage effect to active
+        if(damageValue > 0.10 && damageValue <= 0.25)
+        {
+            if(!damageEffects[2].activeSelf) { damageEffects[2].SetActive(true); }
+            if (!damageEffects[3].activeSelf) { damageEffects[3].SetActive(true); }            
+            // show damaged ship
+            if (!damagedShip.activeSelf) { damagedShip.SetActive(true); }
+        }
+        else if(damageValue >= 0.26 &&  damageValue <= 0.5)
+        {
+            if (!damageEffects[1].activeSelf) { damageEffects[1].SetActive(true); }
+            // show damaged ship
+            if (!damagedShip.activeSelf) { damagedShip.SetActive(true); }
+        }
+        else if(damageValue >= 0.55)
+        {
+            if (!damageEffects[0].activeSelf) { damageEffects[0].SetActive(true); }
+        }
+    }
 }
