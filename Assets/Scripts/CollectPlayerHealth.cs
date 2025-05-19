@@ -5,30 +5,20 @@ using UnityEngine;
 public class CollectPlayerHealth : MonoBehaviour
 {
 
-    [SerializeField] float healthToAdd = 10.0f;
+    [SerializeField] int healthPacks = 1;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.tag == "PlayerShip")
         {
-            PlayerHealth playerHealthScript = collision.gameObject.GetComponentInParent<PlayerHealth>();
-
-            // check health value
-            float playerMaxHealthValue = playerHealthScript.getMaxHealth();
-            float playerCurrentHealthValue = playerHealthScript.getCurrentHealth();
+            PlayerHealth playerHealthScript = collision.gameObject.GetComponentInParent<PlayerHealth>();                   
            
-            if(playerCurrentHealthValue < playerMaxHealthValue)
-            {
-                // add player health
-                playerHealthScript.addHealth(healthToAdd);
-                // Destroy object
-                Destroy(gameObject);
-            }
-            else
-            {
-                // add message on the canvas
-                Debug.Log("Max Health reached");
-            }   
+            // add health pack
+            playerHealthScript.addHealthPack(healthPacks);
+
+            // Destroy object
+            Destroy(gameObject);
+          
         }
     }
 }

@@ -5,8 +5,14 @@ using UnityEngine;
 public class DestroyEnemy : MonoBehaviour
 {
 
-    [SerializeField] GameObject rewardPrefab;
+    [SerializeField] string rewardBuffName;
 
+    private GameObject rewardPrefab;
+
+    private void Start()
+    {
+        rewardPrefab = PlayerRewardManager.Instance.GetPlayerRewardPrefab(rewardBuffName);
+    }
 
     public void onDestroyEnemy()
     {

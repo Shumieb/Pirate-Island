@@ -36,6 +36,8 @@ public class EnemyRoamingMovement : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+
+
         player = FindObjectOfType<PlayerMovement>().transform;
     }
 

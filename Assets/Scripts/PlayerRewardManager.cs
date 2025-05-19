@@ -4,15 +4,47 @@ using UnityEngine;
 
 public class PlayerRewardManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+    [SerializeField] GameObject healthBuffPrefab;
+    [SerializeField] GameObject shieldBuffPrefab;
+    [SerializeField] GameObject chestBuffPrefab;
+
+    [SerializeField] int healthBuffCount;
+    [SerializeField] int shieldBuffCount;
+    [SerializeField] int chestBuffCount;
+
+    private static PlayerRewardManager _instance;
+
+    public static PlayerRewardManager Instance { get { return _instance; } }
+
+    private void Awake()
     {
-        
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public GameObject GetPlayerRewardPrefab(string rewardName)
     {
-        
+        switch (rewardName)
+        {
+            case "healthBuff":
+                healthBuffCount++;
+                return healthBuffPrefab;
+            case "shieldBuff":
+                shieldBuffCount++;
+                return shieldBuffPrefab;
+            case "chestBuff":
+                chestBuffCount++;
+                return chestBuffPrefab;
+            default: return null;
+        }
+
     }
+
 }

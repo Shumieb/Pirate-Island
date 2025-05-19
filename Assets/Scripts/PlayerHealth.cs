@@ -8,8 +8,12 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] int maxLives = 3;
     [SerializeField] int currentLives;
 
+    [SerializeField] int healthPacks = 0;
+
     [SerializeField] float maxHealth;
     [SerializeField] float currentHealth;
+
+    bool canAddHealth = false;
 
     void Start()
     {
@@ -23,7 +27,6 @@ public class PlayerHealth : MonoBehaviour
         { 
             // remove health
             removeLives(1);
-
             // reset health
             currentHealth = maxHealth;
         }
@@ -48,25 +51,27 @@ public class PlayerHealth : MonoBehaviour
 
     public float getCurrentHealth() { return currentHealth;}
 
-    public void addHealth(float value)
-    {
-        float totalHealth = currentHealth + value;
+    public void removeHealth(float value) {  
+        if(currentHealth > 0) { currentHealth -= value;}    
+    }
 
-        if (totalHealth > maxHealth)
-        {
-            int livesToAdd = (int)(totalHealth / maxHealth);
-            float healthToAdd = totalHealth % maxHealth;
+    public void addHealthPack(int value) { healthPacks += value; }
 
-            currentHealth = healthToAdd;
-            addLives(livesToAdd);
-        }
-        else
+    public void useHealthPack() {
+
+        float healthPackAddValue = maxHealth / 4;
+        canAddHealth = (maxHealth - currentHealth) <= healthPackAddValue;
+
+        if (canAddHealth && healthPacks > 0)
         {
-            currentHealth = totalHealth;
+            currentHealth = maxHealth;
+            healthPacks--;
         }
     }
 
-    public void removeHealth(float value) {  
-        if(currentHealth > 0) { currentHealth -= value;}    
+    public bool GetCanAddHealth() {
+        float healthPackAddValue = maxHealth / 4;
+        canAddHealth = (maxHealth - currentHealth) <= healthPackAddValue;
+        return canAddHealth; 
     }
 }
